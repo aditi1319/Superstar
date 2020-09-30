@@ -1,0 +1,131 @@
+
+#importing packages and file
+import pandas as pd
+import numpy as np
+import joblib
+from sklearn.preprocessing import LabelEncoder
+#% matplotlib inline
+import math
+df = pd.read_csv("nikita_attrition.csv")
+
+df.isnull()
+#Dropping StandardHours column
+df = df.drop('StandardHours',axis=1)
+
+FinalNumcData_1=df
+labelEncoder = LabelEncoder()
+labelEncoder = LabelEncoder()
+labelEncoder.fit(df['Gender'])
+df['Gender'] = labelEncoder.transform(df['Gender'])
+labelEncoder = LabelEncoder()
+labelEncoder.fit(df['Department'])
+df['Department'] = labelEncoder.transform(df['Department'])
+labelEncoder = LabelEncoder()
+#labelEncoder.fit(df['Attrition'])
+#df['Attrition'] = labelEncoder.transform(df['Attrition'])
+
+#Converting All categorical values to numeric
+labelEncoder = LabelEncoder()
+
+labelEncoder.fit(df['Gender'])
+df['Gender'] = labelEncoder.transform(df['Gender'])
+
+labelEncoder.fit(df['Department'])
+df['Department'] = labelEncoder.transform(df['Department'])
+
+labelEncoder.fit(df['BusinessTravel'])
+df['BusinessTravel'] = labelEncoder.transform(df['BusinessTravel'])
+
+labelEncoder.fit(df['MaritalStatus'])
+df['MaritalStatus'] = labelEncoder.transform(df['MaritalStatus'])
+
+labelEncoder.fit(df['EnvironmentSatisfaction'])
+df['EnvironmentSatisfaction'] = labelEncoder.transform(df['EnvironmentSatisfaction'])
+
+labelEncoder.fit(df['WorkLifeBalance'])
+df['WorkLifeBalance'] = labelEncoder.transform(df['WorkLifeBalance'])
+
+labelEncoder.fit(df['JobInvolvement'])
+df['JobInvolvement'] = labelEncoder.transform(df['JobInvolvement'])
+
+labelEncoder.fit(df['PerformanceRating'])
+df['PerformanceRating'] = labelEncoder.transform(df['PerformanceRating'])
+
+labelEncoder.fit(df['EducationField'])
+df['EducationField'] = labelEncoder.transform(df['EducationField'])
+
+labelEncoder.fit(df['TotalWorkingYears'])
+df['TotalWorkingYears'] = labelEncoder.transform(df['TotalWorkingYears'])
+
+labelEncoder.fit(df['JobRole'])
+df['JobRole'] = labelEncoder.transform(df['JobRole'])
+
+
+labelEncoder.fit(df['Attrition'])
+df['Attrition'] = labelEncoder.transform(df['Attrition'])
+
+
+
+#Dropping Attrition_yes and employee_ID column for training
+FND_1= df.drop("Attrition", axis = 1)
+FND_1= df.drop("EmployeeID", axis = 1)
+
+
+x = FND_1
+y = df["Attrition"]
+
+#Splitingthe dataframe
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.30, random_state = 0)
+
+#Creating instance for the classifier
+from sklearn.neural_network import MLPClassifier
+clf = MLPClassifier(solver='lbfgs', alpha=1e-5,hidden_layer_sizes=(5, 2), random_state=1)
+
+
+#fitting classifier
+clf.fit(x_train, y_train)
+
+
+#getting predictions
+prediction=clf.predict(x_test)
+print(prediction)
+
+
+#calculating confusion matrix
+from sklearn.metrics import confusion_matrix
+confusion_matrix(y_test, prediction)
+
+
+#getting accuracy score
+from sklearn.metrics import accuracy_score
+acc = accuracy_score(y_test, prediction)
+print("accuracy_score MLP",acc)
+
+
+#calculating Precision value
+from sklearn.metrics import precision_score
+precision = precision_score(y_test, prediction, average='macro')
+print("precision MLP " , precision)
+
+#calculating recall value
+from sklearn.metrics import recall_score
+recall = recall_score(y_test, prediction, average='macro')
+print("Recall MLP",recall)
+
+
+#calculating f1_score
+from sklearn.metrics import  f1_score
+f1_score = f1_score(y_test, prediction, average='macro')
+print("f1_score MLP",f1_score)
+
+
+filename= 'model_neural_network.pkl'
+#saving the model
+
+modelReload = joblib.dump(logmodel,filename )
+
+# load the model from disk
+loaded_model = joblib.load(filename)
+result = loaded_model.accuracy_score(x_test, y_test)
+print(result)

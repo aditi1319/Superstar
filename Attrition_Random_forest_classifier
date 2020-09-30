@@ -1,0 +1,127 @@
+#importing packages and file
+import pandas as pd
+import numpy as np
+import joblib
+from sklearn.preprocessing import LabelEncoder
+#% matplotlib inline
+import math
+df = pd.read_csv("nikita_attrition.csv")
+
+df.isnull()
+#Dropping StandardHours column
+df = df.drop('StandardHours',axis=1)
+
+FinalNumcData_1=df
+labelEncoder = LabelEncoder()
+labelEncoder = LabelEncoder()
+labelEncoder.fit(df['Gender'])
+df['Gender'] = labelEncoder.transform(df['Gender'])
+labelEncoder = LabelEncoder()
+labelEncoder.fit(df['Department'])
+df['Department'] = labelEncoder.transform(df['Department'])
+labelEncoder = LabelEncoder()
+#labelEncoder.fit(df['Attrition'])
+#df['Attrition'] = labelEncoder.transform(df['Attrition'])
+
+#Converting All categorical values to numeric
+labelEncoder = LabelEncoder()
+
+labelEncoder.fit(df['Gender'])
+df['Gender'] = labelEncoder.transform(df['Gender'])
+
+labelEncoder.fit(df['Department'])
+df['Department'] = labelEncoder.transform(df['Department'])
+
+labelEncoder.fit(df['BusinessTravel'])
+df['BusinessTravel'] = labelEncoder.transform(df['BusinessTravel'])
+
+labelEncoder.fit(df['MaritalStatus'])
+df['MaritalStatus'] = labelEncoder.transform(df['MaritalStatus'])
+
+labelEncoder.fit(df['EnvironmentSatisfaction'])
+df['EnvironmentSatisfaction'] = labelEncoder.transform(df['EnvironmentSatisfaction'])
+
+labelEncoder.fit(df['WorkLifeBalance'])
+df['WorkLifeBalance'] = labelEncoder.transform(df['WorkLifeBalance'])
+
+labelEncoder.fit(df['JobInvolvement'])
+df['JobInvolvement'] = labelEncoder.transform(df['JobInvolvement'])
+
+labelEncoder.fit(df['PerformanceRating'])
+df['PerformanceRating'] = labelEncoder.transform(df['PerformanceRating'])
+
+labelEncoder.fit(df['EducationField'])
+df['EducationField'] = labelEncoder.transform(df['EducationField'])
+
+labelEncoder.fit(df['TotalWorkingYears'])
+df['TotalWorkingYears'] = labelEncoder.transform(df['TotalWorkingYears'])
+
+labelEncoder.fit(df['JobRole'])
+df['JobRole'] = labelEncoder.transform(df['JobRole'])
+
+
+labelEncoder.fit(df['Attrition'])
+df['Attrition'] = labelEncoder.transform(df['Attrition'])
+
+
+
+#Dropping Attrition_yes and employee_ID column for training
+FND_1= df.drop("Attrition", axis = 1)
+FND_1= df.drop("EmployeeID", axis = 1)
+
+
+#Train Data
+x = FND_1
+y = df["Attrition"]
+
+#Use the random Forest Classifier
+from sklearn.ensemble import RandomForestClassifier
+Forest = RandomForestClassifier(n_estimators = 25, criterion = 'entropy', random_state = 0)
+Forest.fit(x_train, y_train)
+
+
+#Get the Accuracy on the training Dataset
+accuracy_rfc=Forest.score(x_train, y_train)
+
+
+# Return the feature importances (the higher, the more important the feature).
+importances = pd.DataFrame({'feature':FinalNumcData_1.iloc[:, 1:FinalNumcData_1.shape[1]].columns,'importance':np.round(Forest.feature_importances_,3)}) #Note: The target column is at position 0
+importances = importances.sort_values('importance',ascending=False).set_index('feature')
+print("Important features: ")
+print(importances)
+
+#Show the confusion matrix and Accuracy score for the model on the test data
+from sklearn.metrics import confusion_matrix
+confusion_matrix(y_test, Forest.predict(x_test))
+
+#calculating prediction values
+preds = Forest.predict(x_test)
+#print("predictions", preds)
+
+print("accuracy score for RFC: " ,accuracy_rfc)
+
+#calculating prcison value
+from sklearn.metrics import precision_score
+precision = precision_score(y_test, preds, average='macro')
+print("precision for RFC" , precision)
+
+#calculating recall value
+from sklearn.metrics import recall_score
+recall = recall_score(y_test, preds, average='macro')
+print("Recall for RFC",recall)
+
+#calculating f1_score
+from sklearn.metrics import  f1_score
+f1_score = f1_score(y_test, preds, average='macro')
+print("f1_score for RFC",f1_score)
+
+mport joblib
+filename= 'model_RFC.pkl'
+
+#Dumping the model(saving the model)
+modelReload = joblib.dump(Forest,filename )
+
+# load the model from disk
+loaded_model = joblib.load(filename)
+result = loaded_model.predict(x_test, y_test)
+print(result)

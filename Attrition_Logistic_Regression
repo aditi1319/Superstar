@@ -1,0 +1,181 @@
+#importing packages and file
+import pandas as pd
+import numpy as np
+import joblib
+from sklearn.preprocessing import LabelEncoder
+#% matplotlib inline
+import math
+df = pd.read_csv("nikita_attrition.csv")
+
+df.isnull()
+#Dropping StandardHours column
+df = df.drop('StandardHours',axis=1)
+
+FinalNumcData_1=df
+labelEncoder = LabelEncoder()
+labelEncoder = LabelEncoder()
+labelEncoder.fit(df['Gender'])
+df['Gender'] = labelEncoder.transform(df['Gender'])
+labelEncoder = LabelEncoder()
+labelEncoder.fit(df['Department'])
+df['Department'] = labelEncoder.transform(df['Department'])
+labelEncoder = LabelEncoder()
+#labelEncoder.fit(df['Attrition'])
+#df['Attrition'] = labelEncoder.transform(df['Attrition'])
+
+#Converting All categorical values to numeric
+labelEncoder = LabelEncoder()
+
+labelEncoder.fit(df['Gender'])
+df['Gender'] = labelEncoder.transform(df['Gender'])
+
+labelEncoder.fit(df['Department'])
+df['Department'] = labelEncoder.transform(df['Department'])
+
+labelEncoder.fit(df['BusinessTravel'])
+df['BusinessTravel'] = labelEncoder.transform(df['BusinessTravel'])
+
+labelEncoder.fit(df['MaritalStatus'])
+df['MaritalStatus'] = labelEncoder.transform(df['MaritalStatus'])
+
+labelEncoder.fit(df['EnvironmentSatisfaction'])
+df['EnvironmentSatisfaction'] = labelEncoder.transform(df['EnvironmentSatisfaction'])
+
+labelEncoder.fit(df['WorkLifeBalance'])
+df['WorkLifeBalance'] = labelEncoder.transform(df['WorkLifeBalance'])
+
+labelEncoder.fit(df['JobInvolvement'])
+df['JobInvolvement'] = labelEncoder.transform(df['JobInvolvement'])
+
+labelEncoder.fit(df['PerformanceRating'])
+df['PerformanceRating'] = labelEncoder.transform(df['PerformanceRating'])
+
+labelEncoder.fit(df['EducationField'])
+df['EducationField'] = labelEncoder.transform(df['EducationField'])
+
+labelEncoder.fit(df['TotalWorkingYears'])
+df['TotalWorkingYears'] = labelEncoder.transform(df['TotalWorkingYears'])
+
+labelEncoder.fit(df['JobRole'])
+df['JobRole'] = labelEncoder.transform(df['JobRole'])
+
+
+labelEncoder.fit(df['Attrition'])
+df['Attrition'] = labelEncoder.transform(df['Attrition'])
+
+
+
+#Dropping Attrition_yes and employee_ID column for training
+FND_1= df.drop("Attrition", axis = 1)
+FND_1= df.drop("EmployeeID", axis = 1)
+
+
+
+
+# ## Train Data
+x = FND
+y = FinalNumcData["Attrition_Yes"]
+
+
+# splitting the data
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.30, random_state = 0)
+
+
+#importing necessary package for LogisticRegression
+from sklearn.linear_model import SGDClassifier, LogisticRegression
+
+#Creating instance for LogisticRegression
+logmodel = LogisticRegression()
+
+
+#Feature scaling is a method used to standardize the range of independent variables or features of data.
+from sklearn.preprocessing import StandardScaler
+scale = StandardScaler()
+
+
+#fitting the model
+logmodel.fit(x_train,y_train)
+
+predictions = logmodel.predict(x_test)
+
+
+#importing confusion_matrix package
+from sklearn.metrics import confusion_matrix
+
+#calculating confusion matrix
+
+cm = confusion_matrix(y_test, predictions)
+print(cm)
+
+#impporting accuracy_score package 
+from sklearn.metrics import accuracy_score
+
+acc = accuracy_score(y_test, predictions)
+print("Accuracy for Logistic Regression",acc)
+
+print("accuracy_score percentage" )
+print(acc*100)
+
+
+#calculating prcison value
+from sklearn.metrics import precision_score
+precision = precision_score(y_test, predictions, average='macro')
+print("precision" , precision)
+
+#calculating recall value
+from sklearn.metrics import recall_score
+recall = recall_score(y_test, predictions, average='macro')
+print("Recall",recall)
+
+#calculating f1_score value
+from sklearn.metrics import  f1_score
+f1_score = f1_score(y_test, predictions, average='macro')
+print("f1_score",f1_score)
+
+
+#calculating ROC_SCORE value and roc curve
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_curve
+log_ROC_auc = roc_auc_score(y_train, logmodel.predict(x_train))
+print(log_ROC_auc)
+
+# calculating False positive and true positive ratios and threshold for ploting roc curve
+fpr, tpr, threasholds = roc_curve(y_train,logmodel.predict_proba(x_train)[:,1])
+
+
+# ploting ROC curve
+import matplotlib.pyplot as plt
+from matplotlib import pyplot
+plt.figure()
+plt.plot(fpr,tpr, label="LOG Model 1 (area = %0.2f)" %log_ROC_auc)
+# axis labels
+pyplot.xlabel('False Positive Rate')
+pyplot.ylabel('True Positive Rate')
+plt.show()
+
+#Precison  score and 
+from sklearn.metrics import precision_score
+from sklearn.metrics import precision_recall_curve
+print("Precision:",precision_score(y_test, predictions))
+prc = precision_recall_curve(y_test, predictions)
+print(prc)
+
+#Saving the model using Joblib
+
+import joblib
+filename= 'model_logregression.pkl'
+
+
+modelReload = joblib.dump(logmodel,filename )
+
+
+# load the model from disk
+loaded_model = joblib.load(filename)
+result = loaded_model.score(x_test, y_test)
+print(result)
+
+
+
+
+

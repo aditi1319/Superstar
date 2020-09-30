@@ -74,6 +74,10 @@ FND_1= df.drop("EmployeeID", axis = 1)
 x = FND_1
 y = df["Attrition"]
 
+#Splitingthe dataframe
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.30, random_state = 0)
+
 #Use the random Forest Classifier
 from sklearn.ensemble import RandomForestClassifier
 Forest = RandomForestClassifier(n_estimators = 25, criterion = 'entropy', random_state = 0)
@@ -115,7 +119,7 @@ from sklearn.metrics import  f1_score
 f1_score = f1_score(y_test, preds, average='macro')
 print("f1_score for RFC",f1_score)
 
-mport joblib
+import joblib
 filename= 'model_RFC.pkl'
 
 #Dumping the model(saving the model)
